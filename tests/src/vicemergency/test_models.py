@@ -1,27 +1,32 @@
 """Tests for Pydantic models."""
 
-import json
 from datetime import datetime
 
 import pytest
 
-from src.vicemergency.models import CAPInfo, Feature, FeatureProperties, GeoJSONFeed, Geometry
+from src.vicemergency.models import (
+    CAPInfo,
+    Feature,
+    FeatureProperties,
+    GeoJSONFeed,
+    Geometry,
+)
 
 
 class TestModels:
     """Test Pydantic model validation."""
-    
+
     def test_cap_info_optional_fields(self):
         """Test CAP info with minimal data."""
         cap = CAPInfo()
         assert cap.category is None
         assert cap.event is None
-    
+
     def test_feature_properties_required_fields(self):
         """Test that required fields are enforced."""
         with pytest.raises(ValueError):
             FeatureProperties()
-    
+
     def test_feature_properties_valid(self):
         """Test valid feature properties."""
         props = FeatureProperties(
@@ -33,7 +38,7 @@ class TestModels:
         )
         assert props.feedType == "incident"
         assert props.sourceOrg == "CFA"
-    
+
     def test_feature_properties_mixed_types(self):
         """Test properties with mixed ID types."""
         # String IDs
@@ -45,7 +50,7 @@ class TestModels:
             id="123"
         )
         assert props1.sourceId == "123"
-        
+
         # Integer IDs
         props2 = FeatureProperties(
             feedType="incident",
@@ -55,28 +60,28 @@ class TestModels:
             id=123
         )
         assert props2.sourceId == 123
-    
+
     def test_geometry_types(self):
         """Test different geometry types."""
         # Point
         point = Geometry(type="Point", coordinates=[144.5, -37.5])
         assert point.type == "Point"
         assert point.coordinates == [144.5, -37.5]
-        
+
         # Polygon
         polygon = Geometry(
             type="Polygon",
             coordinates=[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
         )
         assert polygon.type == "Polygon"
-        
+
         # GeometryCollection
         geom_collection = Geometry(
             type="GeometryCollection",
             geometries=[{"type": "Point", "coordinates": [0, 0]}]
         )
         assert geom_collection.type == "GeometryCollection"
-    
+
     def test_feature_complete(self):
         """Test complete feature."""
         feature = Feature(
@@ -95,7 +100,7 @@ class TestModels:
         assert feature.type == "Feature"
         assert feature.properties.sourceId == "123"
         assert feature.geometry.coordinates == [144.5, -37.5]
-    
+
     def test_geojson_feed(self):
         """Test complete GeoJSON feed."""
         feed = GeoJSONFeed(
@@ -115,7 +120,7 @@ class TestModels:
         )
         assert feed.type == "FeatureCollection"
         assert len(feed.features) == 1
-    
+
     def test_extra_fields_allowed(self):
         """Test that extra fields are preserved."""
         props = FeatureProperties(

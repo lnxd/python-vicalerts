@@ -1,7 +1,9 @@
 """Shared test fixtures and configuration."""
 
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch
+
 
 # Speed up tests by making sleep instant
 @pytest.fixture(autouse=True)

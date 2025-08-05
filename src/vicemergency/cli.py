@@ -54,16 +54,16 @@ def cli():
 )
 def run(once: bool, interval: int, db: str, progress: bool):
     """Start polling the VicEmergency feed."""
-    
+
     # Validate interval
     if interval < 10:
         console.print("[red]Error: Interval must be at least 10 seconds")
         raise click.Abort()
-    
+
     # Create poller
     PollerClass = PollerWithProgress if progress and not once else Poller
     poller = PollerClass(db_path=db, interval=interval)
-    
+
     try:
         if once:
             console.print("[blue]Running single poll...")
@@ -87,19 +87,19 @@ def run(once: bool, interval: int, db: str, progress: bool):
 def stats(db: str):
     """Show database statistics."""
     from .database import Database
-    
+
     if not Path(db).exists():
         console.print(f"[red]Database not found: {db}")
         raise click.Abort()
-    
+
     database = Database(db)
     stats = database.get_stats()
-    
+
     console.print("\n[bold]VicEmergency Database Statistics[/bold]\n")
     console.print(f"Total feeds archived: {stats['total_feeds']}")
     console.print(f"Total events tracked: {stats['total_events']}")
     console.print(f"Total versions: {stats['total_versions']}")
-    
+
     if stats["events_by_type"]:
         console.print("\n[bold]Events by type:[/bold]")
         for feed_type, count in sorted(stats["events_by_type"].items()):
@@ -117,25 +117,25 @@ def stats(db: str):
 def history(db: str, event_id: int):
     """Show version history for an event."""
     from .database import Database
-    
+
     database = Database(db)
     versions = database.get_event_versions(event_id)
-    
+
     if not versions:
         console.print(f"[red]No event found with ID: {event_id}")
         raise click.Abort()
-    
+
     console.print(f"\n[bold]History for Event {event_id}[/bold]\n")
-    
+
     for i, version in enumerate(versions):
         console.print(f"[cyan]Version {i + 1} - {version['version_ts']}[/cyan]")
         console.print(f"Status: {version['status'] or 'N/A'}")
         console.print(f"Headline: {version['headline'] or 'N/A'}")
         console.print(f"Location: {version['location'] or 'N/A'}")
-        
+
         if version['lat'] and version['lon']:
             console.print(f"Coordinates: {version['lat']:.6f}, {version['lon']:.6f}")
-        
+
         console.print()
 
 

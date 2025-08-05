@@ -1,98 +1,98 @@
 """Pydantic models for VicEmergency GeoJSON feed."""
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
 class CAPInfo(BaseModel):
     """Common Alerting Protocol information."""
-    
-    category: Optional[str] = None
-    event: Optional[str] = None
-    eventCode: Optional[str] = None
-    urgency: Optional[str] = None
-    severity: Optional[str] = None
-    certainty: Optional[str] = None
-    contact: Optional[str] = None
-    senderName: Optional[str] = None
-    responseType: Optional[str] = None
+
+    category: str | None = None
+    event: str | None = None
+    eventCode: str | None = None
+    urgency: str | None = None
+    severity: str | None = None
+    certainty: str | None = None
+    contact: str | None = None
+    senderName: str | None = None
+    responseType: str | None = None
 
 
 class FeatureProperties(BaseModel):
     """Properties of a GeoJSON feature."""
-    
+
     feedType: str
     sourceOrg: str
-    sourceId: Union[str, int]  # Can be string or int
+    sourceId: str | int  # Can be string or int
     sourceFeed: str
-    sourceTitle: Optional[str] = None
-    id: Union[str, int]  # Can be string or int
-    category1: Optional[str] = None
-    category2: Optional[str] = None
-    status: Optional[str] = None
-    name: Optional[str] = None
-    created: Optional[datetime] = None
-    updated: Optional[datetime] = None  # Some features may not have this
-    location: Optional[str] = None
-    size: Optional[Union[float, str]] = None  # Can be numeric or "Small", etc
-    sizeFmt: Optional[str] = None
-    url: Optional[str] = None
-    webHeadline: Optional[str] = None
-    webBody: Optional[str] = None
-    text: Optional[str] = None
-    resources: Optional[Union[List[str], int]] = None  # Can be list or count
-    mfbId: Optional[Union[str, int]] = None
-    cfaId: Optional[Union[str, int]] = None
-    eventId: Optional[Union[str, int]] = None
-    action: Optional[str] = None
-    statewide: Optional[str] = None
-    cap: Optional[CAPInfo] = None
-    incidentFeatures: Optional[List[Any]] = None  # Nested features
-    
+    sourceTitle: str | None = None
+    id: str | int  # Can be string or int
+    category1: str | None = None
+    category2: str | None = None
+    status: str | None = None
+    name: str | None = None
+    created: datetime | None = None
+    updated: datetime | None = None  # Some features may not have this
+    location: str | None = None
+    size: float | str | None = None  # Can be numeric or "Small", etc
+    sizeFmt: str | None = None
+    url: str | None = None
+    webHeadline: str | None = None
+    webBody: str | None = None
+    text: str | None = None
+    resources: list[str] | int | None = None  # Can be list or count
+    mfbId: str | int | None = None
+    cfaId: str | int | None = None
+    eventId: str | int | None = None
+    action: str | None = None
+    statewide: str | None = None
+    cap: CAPInfo | None = None
+    incidentFeatures: list[Any] | None = None  # Nested features
+
     model_config = {"extra": "allow"}  # Allow additional fields
 
 
 class Geometry(BaseModel):
     """GeoJSON geometry."""
-    
+
     type: str
-    coordinates: Optional[Union[List[float], List[List[float]], List[List[List[float]]]]] = None
-    geometries: Optional[List[Dict[str, Any]]] = None  # For GeometryCollection
-    
+    coordinates: list[float] | list[list[float]] | list[list[list[float]]] | None = None
+    geometries: list[dict[str, Any]] | None = None  # For GeometryCollection
+
     class Config:
         extra = "allow"
 
 
 class Feature(BaseModel):
     """GeoJSON feature."""
-    
+
     type: str = Field(default="Feature")
     properties: FeatureProperties
-    geometry: Optional[Geometry] = None
+    geometry: Geometry | None = None
 
 
 class FeedProperties(BaseModel):
     """Top-level feed properties."""
-    
-    generated: Optional[datetime] = None
-    lastUpdated: Optional[datetime] = None
-    authority: Optional[str] = None
-    conditions: Optional[Dict[str, Any]] = None
-    forecast: Optional[Dict[str, Any]] = None
-    featureCount: Optional[int] = None
-    
+
+    generated: datetime | None = None
+    lastUpdated: datetime | None = None
+    authority: str | None = None
+    conditions: dict[str, Any] | None = None
+    forecast: dict[str, Any] | None = None
+    featureCount: int | None = None
+
     class Config:
         extra = "allow"
 
 
 class GeoJSONFeed(BaseModel):
     """Complete GeoJSON feed."""
-    
+
     type: str = Field(default="FeatureCollection")
-    features: List[Feature]
-    properties: Optional[FeedProperties] = None
-    notices: Optional[List[Any]] = None
-    lastUpdated: Optional[datetime] = None
-    featureCount: Optional[int] = None
+    features: list[Feature]
+    properties: FeedProperties | None = None
+    notices: list[Any] | None = None
+    lastUpdated: datetime | None = None
+    featureCount: int | None = None

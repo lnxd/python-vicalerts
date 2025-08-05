@@ -24,7 +24,7 @@ logger = logging.getLogger("vicalerts")
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="vicalerts")
+@click.version_option(version="0.2.0", prog_name="vicalerts")
 def cli():
     """VicAlerts feed poller and change tracker."""
     pass

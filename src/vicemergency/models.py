@@ -51,8 +51,7 @@ class FeatureProperties(BaseModel):
     cap: Optional[CAPInfo] = None
     incidentFeatures: Optional[List[Any]] = None  # Nested features
     
-    class Config:
-        extra = "allow"  # Allow additional fields
+    model_config = {"extra": "allow"}  # Allow additional fields
 
 
 class Geometry(BaseModel):

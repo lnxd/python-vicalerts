@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.vicemergency.poller import Poller, PollerWithProgress
+from src.vicalerts.poller import Poller, PollerWithProgress
 
 
 class TestPoller:
@@ -14,7 +14,7 @@ class TestPoller:
     @pytest.fixture
     def mock_database(self):
         """Mock database class."""
-        with patch("src.vicemergency.poller.Database") as mock_db:
+        with patch("src.vicalerts.poller.Database") as mock_db:
             yield mock_db
 
     @pytest.fixture
@@ -34,8 +34,8 @@ class TestPoller:
         poller._signal_handler(signal.SIGINT, None)
         assert poller.running is False
 
-    @patch("src.vicemergency.poller.RetryClient")
-    @patch("src.vicemergency.poller.FeedParser")
+    @patch("src.vicalerts.poller.RetryClient")
+    @patch("src.vicalerts.poller.FeedParser")
     def test_run_once_with_changes(self, mock_parser_class, mock_client_class, poller):
         """Test single poll with changes."""
         # Mock client
@@ -69,7 +69,7 @@ class TestPoller:
         mock_client.fetch_with_retry.assert_called_once_with("old-etag")
         mock_parser.parse_and_store.assert_called_once_with(mock_feed, "new-etag")
 
-    @patch("src.vicemergency.poller.RetryClient")
+    @patch("src.vicalerts.poller.RetryClient")
     def test_run_once_not_modified(self, mock_client_class, poller):
         """Test single poll with 304 response."""
         mock_client = Mock()
@@ -82,7 +82,7 @@ class TestPoller:
 
         assert result is False  # No changes
 
-    @patch("src.vicemergency.poller.RetryClient")
+    @patch("src.vicalerts.poller.RetryClient")
     def test_run_once_error(self, mock_client_class, poller):
         """Test single poll with error."""
         mock_client = Mock()
@@ -137,10 +137,10 @@ class TestPollerWithProgress:
     @pytest.fixture
     def poller(self):
         """Create a progress poller instance."""
-        with patch("src.vicemergency.poller.Database"):
+        with patch("src.vicalerts.poller.Database"):
             return PollerWithProgress(interval=5)
 
-    @patch("src.vicemergency.poller.Live")
+    @patch("src.vicalerts.poller.Live")
     @patch("time.sleep")
     def test_run_with_progress(self, mock_sleep, mock_live_class, poller):
         """Test run with live progress display."""

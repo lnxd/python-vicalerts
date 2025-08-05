@@ -1,4 +1,4 @@
-"""HTTP client for fetching VicEmergency feed with conditional GET support."""
+"""HTTP client for fetching Victoria Emergency feed with conditional GET support."""
 
 import time
 
@@ -11,11 +11,11 @@ console = Console()
 
 FEED_URL = "https://emergency.vic.gov.au/public/events-geojson.json"
 DEFAULT_TIMEOUT = 30.0
-USER_AGENT = "vicemergency-poller/0.1.0"
+USER_AGENT = "vicalerts/0.1.0"
 
 
 class FeedClient:
-    """HTTP client for fetching the VicEmergency feed."""
+    """HTTP client for fetching the Victoria Emergency feed."""
 
     def __init__(self, timeout: float = DEFAULT_TIMEOUT):
         self.timeout = timeout

@@ -1,4 +1,4 @@
-"""Command-line interface for VicEmergency poller."""
+"""Command-line interface for Victoria Emergency poller."""
 
 import logging
 from pathlib import Path
@@ -19,13 +19,13 @@ logging.basicConfig(
     handlers=[RichHandler(console=console, rich_tracebacks=True)]
 )
 
-logger = logging.getLogger("vicemergency")
+logger = logging.getLogger("vicalerts")
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="vicemergency")
+@click.version_option(version="0.1.0", prog_name="vicalerts")
 def cli():
-    """Victoria Emergency feed poller and change tracker."""
+    """VicAlerts feed poller and change tracker."""
     pass
 
 
@@ -44,7 +44,7 @@ def cli():
 @click.option(
     "--db",
     type=click.Path(),
-    default="vicemergency.sqlite",
+    default="vicalerts.sqlite",
     help="Database file path"
 )
 @click.option(
@@ -53,7 +53,7 @@ def cli():
     help="Show countdown progress (default: enabled)"
 )
 def run(once: bool, interval: int, db: str, progress: bool):
-    """Start polling the VicEmergency feed."""
+    """Start polling the Victoria Emergency feed."""
 
     # Validate interval
     if interval < 10:
@@ -81,7 +81,7 @@ def run(once: bool, interval: int, db: str, progress: bool):
 @click.option(
     "--db",
     type=click.Path(exists=True),
-    default="vicemergency.sqlite",
+    default="vicalerts.sqlite",
     help="Database file path"
 )
 def stats(db: str):
@@ -95,7 +95,7 @@ def stats(db: str):
     database = Database(db)
     stats = database.get_stats()
 
-    console.print("\n[bold]VicEmergency Database Statistics[/bold]\n")
+    console.print("\n[bold]Victoria Emergency Database Statistics[/bold]\n")
     console.print(f"Total feeds archived: {stats['total_feeds']}")
     console.print(f"Total events tracked: {stats['total_events']}")
     console.print(f"Total versions: {stats['total_versions']}")
@@ -110,7 +110,7 @@ def stats(db: str):
 @click.option(
     "--db",
     type=click.Path(exists=True),
-    default="vicemergency.sqlite",
+    default="vicalerts.sqlite",
     help="Database file path"
 )
 @click.argument("event_id", type=int)

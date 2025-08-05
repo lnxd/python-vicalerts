@@ -1,4 +1,4 @@
-"""Script to fetch and analyze the VicEmergency feed structure."""
+"""Script to fetch and analyze the Victoria Emergency feed structure."""
 
 from pprint import pprint
 

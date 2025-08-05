@@ -5,9 +5,9 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.vicemergency.database import Database
-from src.vicemergency.models import Feature, FeatureProperties, GeoJSONFeed, Geometry
-from src.vicemergency.parser import FeedParser
+from src.vicalerts.database import Database
+from src.vicalerts.models import Feature, FeatureProperties, GeoJSONFeed, Geometry
+from src.vicalerts.parser import FeedParser
 
 
 class TestFeedParser:

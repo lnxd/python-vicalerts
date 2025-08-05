@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "vicemergency"
+name = "vicalerts"
 version = "0.1.0"
-description = "Poll and track changes to Victoria Emergency incidents feed"
+description = "Track & archive Victoria's live emergency alerts"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -29,10 +29,10 @@ dev = [
 ]
 
 [project.scripts]
-vicemergency = "vicemergency.cli:cli"
+vicalerts = "vicalerts.cli:cli"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/vicemergency"]
+packages = ["src/vicalerts"]
 
 [tool.ruff]
 line-length = 88

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from src.vicemergency.database import Database
+from src.vicalerts.database import Database
 
 
 class TestDatabase:

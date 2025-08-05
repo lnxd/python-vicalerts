@@ -1,4 +1,4 @@
-"""Parser for VicEmergency feed with change detection."""
+"""Parser for Victoria Emergency feed with change detection."""
 
 import json
 from datetime import datetime, timezone

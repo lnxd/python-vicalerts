@@ -1,4 +1,4 @@
-"""SQLite database management for VicEmergency feed data."""
+"""SQLite database management for Victoria Emergency feed data."""
 
 import gzip
 import json
@@ -11,7 +11,7 @@ from rich.console import Console
 
 console = Console()
 
-DEFAULT_DB_PATH = "vicemergency.sqlite"
+DEFAULT_DB_PATH = "vicalerts.sqlite"
 
 
 SCHEMA_SQL = """
@@ -54,7 +54,7 @@ CREATE INDEX IF NOT EXISTS idx_events_last_seen ON events(last_seen);
 
 
 class Database:
-    """Database wrapper for VicEmergency data."""
+    """Database wrapper for Victoria Emergency data."""
 
     def __init__(self, db_path: str = DEFAULT_DB_PATH):
         self.db_path = Path(db_path)

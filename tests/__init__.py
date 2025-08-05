@@ -1,1 +1,1 @@
-"""Test suite for VicEmergency poller."""
+"""Test suite for VicAlerts."""

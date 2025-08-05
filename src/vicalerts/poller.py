@@ -1,4 +1,4 @@
-"""Main polling loop for VicEmergency feed."""
+"""Main polling loop for Victoria Emergency feed."""
 
 import signal
 import time
@@ -19,7 +19,7 @@ console = Console()
 class Poller:
     """Main polling loop with signal handling."""
 
-    def __init__(self, db_path: str = "vicemergency.sqlite", interval: int = 60):
+    def __init__(self, db_path: str = "vicalerts.sqlite", interval: int = 60):
         self.db = Database(db_path)
         self.interval = interval
         self.running = False
@@ -71,7 +71,7 @@ class Poller:
     def run(self):
         """Run continuous polling loop."""
         console.print(Panel.fit(
-            "[bold green]VicEmergency Feed Poller[/bold green]\n"
+            "[bold green]VicAlerts[/bold green]\n"
             f"Polling every {self.interval} seconds\n"
             "Press Ctrl+C to stop",
             border_style="green"
@@ -127,7 +127,7 @@ class PollerWithProgress(Poller):
     def run(self):
         """Run with live countdown display."""
         console.print(Panel.fit(
-            "[bold green]VicEmergency Feed Poller[/bold green]\n"
+            "[bold green]VicAlerts[/bold green]\n"
             f"Polling every {self.interval} seconds\n"
             "Press Ctrl+C to stop",
             border_style="green"

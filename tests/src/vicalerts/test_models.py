@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from src.vicemergency.models import (
+from src.vicalerts.models import (
     CAPInfo,
     Feature,
     FeatureProperties,

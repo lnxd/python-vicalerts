@@ -1,4 +1,4 @@
-"""Pydantic models for VicEmergency GeoJSON feed."""
+"""Pydantic models for Victoria Emergency GeoJSON feed."""
 
 from datetime import datetime
 from typing import Any

@@ -44,7 +44,7 @@ htmlcov/
 *~
 
 # Project specific
-vicemergency.sqlite
+vicalerts.sqlite
 *.sqlite-journal
 *.sqlite-wal
 *.sqlite-shm

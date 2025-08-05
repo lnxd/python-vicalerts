@@ -1,6 +1,6 @@
 # VicAlerts
 
-Track & archive Victoria's live emergency alerts.
+Track & archive VicEmergency alerts.
 
 ## Installation
 

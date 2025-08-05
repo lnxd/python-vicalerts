@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vicemergency"
+version = "0.1.0"
+description = "Poll and track changes to Victoria Emergency incidents feed"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+dependencies = [
+    "httpx>=0.27.0",
+    "pydantic>=2.0",
+    "rich>=13.0",
+    "click>=8.1",
+    "sqlite-utils>=3.36",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.3.0",
+    "black>=24.0",
+]
+
+[project.scripts]
+vicemergency = "vicemergency.cli:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vicemergency"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

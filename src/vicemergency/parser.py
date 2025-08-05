@@ -1,5 +1,6 @@
 """Parser for VicEmergency feed with change detection."""
 
+import json
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -32,7 +33,8 @@ class FeedParser:
         
         # Store raw feed
         now = datetime.now(timezone.utc).isoformat()
-        feed_dict = feed.model_dump()
+        feed_dict = feed.model_dump_json()  # Serialize to JSON string first
+        feed_dict = json.loads(feed_dict)  # Then parse back to dict
         self.db.store_raw_feed(feed_dict, etag=etag, fetched_at=now)
         
         # Process each feature
@@ -59,8 +61,12 @@ class FeedParser:
         """
         props = feature.properties
         
-        # Convert sourceId to int for database
-        event_id = int(props.sourceId) if isinstance(props.sourceId, str) else props.sourceId
+        # Convert sourceId to int for database if possible, otherwise hash it
+        try:
+            event_id = int(props.sourceId) if isinstance(props.sourceId, str) else props.sourceId
+        except ValueError:
+            # For non-numeric IDs, use a hash
+            event_id = hash(props.sourceId) & 0x7FFFFFFF  # Keep it positive and 32-bit
         
         # Check if event exists
         existing = list(self.db.db["events"].rows_where("event_id = ?", [event_id]))
@@ -99,7 +105,7 @@ class FeedParser:
             lon=lon,
             location=props.location,
             size_fmt=props.sizeFmt,
-            raw_props=props.model_dump()
+            raw_props=json.loads(props.model_dump_json())  # Serialize then parse for datetime handling
         )
         
         return is_new, is_new_version

@@ -24,14 +24,16 @@ class FeedClient:
             headers={
                 "User-Agent": USER_AGENT,
                 "Accept": "application/json",
-                "Accept-Encoding": "gzip, deflate"
-            }
+                "Accept-Encoding": "gzip, deflate",
+            },
         )
 
-    def fetch(self, etag: str | None = None) -> tuple[GeoJSONFeed | None, str | None, int]:
+    def fetch(
+        self, etag: str | None = None
+    ) -> tuple[GeoJSONFeed | None, str | None, int]:
         """
         Fetch the feed with optional ETag for conditional GET.
-        
+
         Returns:
             Tuple of (feed_data, new_etag, status_code)
             feed_data is None if status is 304 (Not Modified)
@@ -82,14 +84,21 @@ class FeedClient:
 class RetryClient(FeedClient):
     """Feed client with exponential backoff retry logic."""
 
-    def __init__(self, timeout: float = DEFAULT_TIMEOUT, max_retries: int = 3,
-                 base_delay: float = 1.0, max_delay: float = 60.0):
+    def __init__(
+        self,
+        timeout: float = DEFAULT_TIMEOUT,
+        max_retries: int = 3,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0,
+    ):
         super().__init__(timeout)
         self.max_retries = max_retries
         self.base_delay = base_delay
         self.max_delay = max_delay
 
-    def fetch_with_retry(self, etag: str | None = None) -> tuple[GeoJSONFeed | None, str | None, int]:
+    def fetch_with_retry(
+        self, etag: str | None = None
+    ) -> tuple[GeoJSONFeed | None, str | None, int]:
         """Fetch with exponential backoff on failure."""
         last_error = None
 
@@ -101,8 +110,10 @@ class RetryClient(FeedClient):
 
                 if attempt < self.max_retries - 1:
                     # Calculate delay with exponential backoff
-                    delay = min(self.base_delay * (2 ** attempt), self.max_delay)
-                    console.print(f"[yellow]Retry {attempt + 1}/{self.max_retries} after {delay:.1f}s...")
+                    delay = min(self.base_delay * (2**attempt), self.max_delay)
+                    console.print(
+                        f"[yellow]Retry {attempt + 1}/{self.max_retries} after {delay:.1f}s..."
+                    )
                     time.sleep(delay)
 
         # All retries failed

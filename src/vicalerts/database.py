@@ -71,7 +71,9 @@ class Database:
         with self.db.conn:
             yield self.db
 
-    def store_raw_feed(self, feed_data: dict[str, Any], etag: str | None = None, fetched_at: str = None) -> int:
+    def store_raw_feed(
+        self, feed_data: dict[str, Any], etag: str | None = None, fetched_at: str = None
+    ) -> int:
         """Store compressed raw feed data."""
         from datetime import datetime, timezone
 
@@ -79,15 +81,13 @@ class Database:
             fetched_at = datetime.now(timezone.utc).isoformat()
 
         # Compress JSON payload
-        json_bytes = json.dumps(feed_data, separators=(',', ':')).encode('utf-8')
+        json_bytes = json.dumps(feed_data, separators=(",", ":")).encode("utf-8")
         compressed = gzip.compress(json_bytes)
 
         table = self.db["feeds_raw"]
-        row_id = table.insert({
-            "fetched_at": fetched_at,
-            "etag": etag,
-            "payload": compressed
-        }).last_pk
+        row_id = table.insert(
+            {"fetched_at": fetched_at, "etag": etag, "payload": compressed}
+        ).last_pk
 
         return row_id
 
@@ -109,11 +109,17 @@ class Database:
 
         compressed = result[0]
         json_bytes = gzip.decompress(compressed)
-        return json.loads(json_bytes.decode('utf-8'))
+        return json.loads(json_bytes.decode("utf-8"))
 
-    def upsert_event(self, event_id: int, feed_type: str, source_org: str,
-                     category1: str | None, category2: str | None,
-                     timestamp: str) -> None:
+    def upsert_event(
+        self,
+        event_id: int,
+        feed_type: str,
+        source_org: str,
+        category1: str | None,
+        category2: str | None,
+        timestamp: str,
+    ) -> None:
         """Insert or update an event record."""
         table = self.db["events"]
 
@@ -126,49 +132,61 @@ class Database:
             table.update(event_id, {"last_seen": timestamp})
         else:
             # Insert new event
-            table.insert({
-                "event_id": event_id,
-                "first_seen": timestamp,
-                "last_seen": timestamp,
-                "feed_type": feed_type,
-                "source_org": source_org,
-                "category1": category1,
-                "category2": category2
-            })
+            table.insert(
+                {
+                    "event_id": event_id,
+                    "first_seen": timestamp,
+                    "last_seen": timestamp,
+                    "feed_type": feed_type,
+                    "source_org": source_org,
+                    "category1": category1,
+                    "category2": category2,
+                }
+            )
 
-    def add_event_version(self, event_id: int, version_ts: str, status: str | None,
-                          headline: str | None, category: str | None,
-                          lat: float | None, lon: float | None,
-                          location: str | None, size_fmt: str | None,
-                          raw_props: dict[str, Any]) -> bool:
+    def add_event_version(
+        self,
+        event_id: int,
+        version_ts: str,
+        status: str | None,
+        headline: str | None,
+        category: str | None,
+        lat: float | None,
+        lon: float | None,
+        location: str | None,
+        size_fmt: str | None,
+        raw_props: dict[str, Any],
+    ) -> bool:
         """Add a new event version if it doesn't exist."""
         table = self.db["event_versions"]
 
         # Check if this version already exists
         existing = self.db.execute(
             "SELECT 1 FROM event_versions WHERE event_id = ? AND version_ts = ?",
-            [event_id, version_ts]
+            [event_id, version_ts],
         ).fetchone()
 
         if existing:
             return False
 
         # Compress properties
-        json_bytes = json.dumps(raw_props, separators=(',', ':')).encode('utf-8')
+        json_bytes = json.dumps(raw_props, separators=(",", ":")).encode("utf-8")
         compressed = gzip.compress(json_bytes)
 
-        table.insert({
-            "event_id": event_id,
-            "version_ts": version_ts,
-            "status": status,
-            "headline": headline,
-            "category": category,
-            "lat": lat,
-            "lon": lon,
-            "location": location,
-            "size_fmt": size_fmt,
-            "raw_props": compressed
-        })
+        table.insert(
+            {
+                "event_id": event_id,
+                "version_ts": version_ts,
+                "status": status,
+                "headline": headline,
+                "category": category,
+                "lat": lat,
+                "lon": lon,
+                "location": location,
+                "size_fmt": size_fmt,
+                "raw_props": compressed,
+            }
+        )
 
         return True
 
@@ -178,34 +196,42 @@ class Database:
 
         for row in self.db.execute(
             "SELECT * FROM event_versions WHERE event_id = ? ORDER BY version_ts",
-            [event_id]
+            [event_id],
         ):
             # Decompress properties
             compressed = row[9]  # raw_props column
             json_bytes = gzip.decompress(compressed)
-            raw_props = json.loads(json_bytes.decode('utf-8'))
+            raw_props = json.loads(json_bytes.decode("utf-8"))
 
-            results.append({
-                "event_id": row[0],
-                "version_ts": row[1],
-                "status": row[2],
-                "headline": row[3],
-                "category": row[4],
-                "lat": row[5],
-                "lon": row[6],
-                "location": row[7],
-                "size_fmt": row[8],
-                "raw_props": raw_props
-            })
+            results.append(
+                {
+                    "event_id": row[0],
+                    "version_ts": row[1],
+                    "status": row[2],
+                    "headline": row[3],
+                    "category": row[4],
+                    "lat": row[5],
+                    "lon": row[6],
+                    "location": row[7],
+                    "size_fmt": row[8],
+                    "raw_props": raw_props,
+                }
+            )
 
         return results
 
     def get_stats(self) -> dict[str, Any]:
         """Get database statistics."""
         stats = {
-            "total_feeds": self.db.execute("SELECT COUNT(*) FROM feeds_raw").fetchone()[0],
-            "total_events": self.db.execute("SELECT COUNT(*) FROM events").fetchone()[0],
-            "total_versions": self.db.execute("SELECT COUNT(*) FROM event_versions").fetchone()[0],
+            "total_feeds": self.db.execute("SELECT COUNT(*) FROM feeds_raw").fetchone()[
+                0
+            ],
+            "total_events": self.db.execute("SELECT COUNT(*) FROM events").fetchone()[
+                0
+            ],
+            "total_versions": self.db.execute(
+                "SELECT COUNT(*) FROM event_versions"
+            ).fetchone()[0],
         }
 
         # Get events by feed type

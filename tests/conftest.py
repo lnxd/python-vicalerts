@@ -32,16 +32,10 @@ def sample_geojson_response():
                     "status": "active",
                     "location": "Test Location",
                     "created": "2025-01-01T10:00:00+10:00",
-                    "updated": "2025-01-01T10:00:00+10:00"
+                    "updated": "2025-01-01T10:00:00+10:00",
                 },
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [144.5, -37.5]
-                }
+                "geometry": {"type": "Point", "coordinates": [144.5, -37.5]},
             }
         ],
-        "properties": {
-            "lastUpdated": "2025-01-01T10:00:00Z",
-            "featureCount": 1
-        }
+        "properties": {"lastUpdated": "2025-01-01T10:00:00Z", "featureCount": 1},
     }

@@ -29,7 +29,7 @@ class TestDatabase:
         """Test storing raw feed data."""
         feed_data = {
             "type": "FeatureCollection",
-            "features": [{"id": 1, "data": "test"}]
+            "features": [{"id": 1, "data": "test"}],
         }
 
         feed_id = temp_db.store_raw_feed(feed_data, etag="test-etag")
@@ -93,23 +93,47 @@ class TestDatabase:
         # Add first version
         props = {"test": "data", "status": "active"}
         result = temp_db.add_event_version(
-            123, now, "active", "Test Fire", "Fire",
-            -37.5, 144.5, "Test Location", "Small", props
+            123,
+            now,
+            "active",
+            "Test Fire",
+            "Fire",
+            -37.5,
+            144.5,
+            "Test Location",
+            "Small",
+            props,
         )
         assert result is True
 
         # Try to add same version (should return False)
         result = temp_db.add_event_version(
-            123, now, "active", "Test Fire", "Fire",
-            -37.5, 144.5, "Test Location", "Small", props
+            123,
+            now,
+            "active",
+            "Test Fire",
+            "Fire",
+            -37.5,
+            144.5,
+            "Test Location",
+            "Small",
+            props,
         )
         assert result is False
 
         # Add different version
         later = datetime.now(timezone.utc).isoformat()
         result = temp_db.add_event_version(
-            123, later, "contained", "Test Fire", "Fire",
-            -37.5, 144.5, "Test Location", "Small", props
+            123,
+            later,
+            "contained",
+            "Test Fire",
+            "Fire",
+            -37.5,
+            144.5,
+            "Test Location",
+            "Small",
+            props,
         )
         assert result is True
 
@@ -123,14 +147,30 @@ class TestDatabase:
         props2 = {"version": 2}
 
         temp_db.add_event_version(
-            123, now, "active", "Fire 1", "Fire",
-            -37.5, 144.5, "Location 1", "Small", props1
+            123,
+            now,
+            "active",
+            "Fire 1",
+            "Fire",
+            -37.5,
+            144.5,
+            "Location 1",
+            "Small",
+            props1,
         )
 
         later = datetime.now(timezone.utc).isoformat()
         temp_db.add_event_version(
-            123, later, "contained", "Fire 2", "Fire",
-            -37.6, 144.6, "Location 2", "Medium", props2
+            123,
+            later,
+            "contained",
+            "Fire 2",
+            "Fire",
+            -37.6,
+            144.6,
+            "Location 2",
+            "Medium",
+            props2,
         )
 
         # Get versions
@@ -144,12 +184,7 @@ class TestDatabase:
     def test_compression(self, temp_db):
         """Test data compression."""
         # Create large data
-        large_data = {
-            "features": [
-                {"id": i, "data": "x" * 1000}
-                for i in range(100)
-            ]
-        }
+        large_data = {"features": [{"id": i, "data": "x" * 1000} for i in range(100)]}
 
         feed_id = temp_db.store_raw_feed(large_data)
 
@@ -180,7 +215,9 @@ class TestDatabase:
         temp_db.store_raw_feed({})
         temp_db.upsert_event(1, "incident", "CFA", None, None, now)
         temp_db.upsert_event(2, "warning", "EMV", None, None, now)
-        temp_db.add_event_version(1, now, "active", None, None, None, None, None, None, {})
+        temp_db.add_event_version(
+            1, now, "active", None, None, None, None, None, None, {}
+        )
 
         stats = temp_db.get_stats()
         assert stats["total_feeds"] == 1

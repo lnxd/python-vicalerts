@@ -16,7 +16,7 @@ logging.basicConfig(
     level="INFO",
     format="%(message)s",
     datefmt="[%Y-%m-%d %H:%M:%S]",
-    handlers=[RichHandler(console=console, rich_tracebacks=True)]
+    handlers=[RichHandler(console=console, rich_tracebacks=True)],
 )
 
 logger = logging.getLogger("vicalerts")
@@ -30,27 +30,17 @@ def cli():
 
 
 @cli.command()
+@click.option("--once", is_flag=True, help="Run once and exit")
 @click.option(
-    "--once",
-    is_flag=True,
-    help="Run once and exit"
+    "--interval", type=int, default=60, help="Polling interval in seconds (default: 60)"
 )
 @click.option(
-    "--interval",
-    type=int,
-    default=60,
-    help="Polling interval in seconds (default: 60)"
-)
-@click.option(
-    "--db",
-    type=click.Path(),
-    default="vicalerts.sqlite",
-    help="Database file path"
+    "--db", type=click.Path(), default="vicalerts.sqlite", help="Database file path"
 )
 @click.option(
     "--progress/--no-progress",
     default=True,
-    help="Show countdown progress (default: enabled)"
+    help="Show countdown progress (default: enabled)",
 )
 def run(once: bool, interval: int, db: str, progress: bool):
     """Start polling the Victoria Emergency feed."""
@@ -82,7 +72,7 @@ def run(once: bool, interval: int, db: str, progress: bool):
     "--db",
     type=click.Path(exists=True),
     default="vicalerts.sqlite",
-    help="Database file path"
+    help="Database file path",
 )
 def stats(db: str):
     """Show database statistics."""
@@ -111,7 +101,7 @@ def stats(db: str):
     "--db",
     type=click.Path(exists=True),
     default="vicalerts.sqlite",
-    help="Database file path"
+    help="Database file path",
 )
 @click.argument("event_id", type=int)
 def history(db: str, event_id: int):
@@ -133,7 +123,7 @@ def history(db: str, event_id: int):
         console.print(f"Headline: {version['headline'] or 'N/A'}")
         console.print(f"Location: {version['location'] or 'N/A'}")
 
-        if version['lat'] and version['lon']:
+        if version["lat"] and version["lon"]:
             console.print(f"Coordinates: {version['lat']:.6f}, {version['lon']:.6f}")
 
         console.print()

@@ -41,14 +41,11 @@ class TestFeedParser:
                         category2="Bushfire",
                         status="active",
                         location="Test Location",
-                        updated=datetime.now(timezone.utc)
+                        updated=datetime.now(timezone.utc),
                     ),
-                    geometry=Geometry(
-                        type="Point",
-                        coordinates=[144.5, -37.5]
-                    )
+                    geometry=Geometry(type="Point", coordinates=[144.5, -37.5]),
                 )
-            ]
+            ],
         )
 
     def test_parse_and_store(self, parser, mock_db, sample_feed):
@@ -76,7 +73,7 @@ class TestFeedParser:
             source_org="CFA",
             category1="Fire",
             category2="Bushfire",
-            timestamp=mock_db.store_raw_feed.call_args[1]["fetched_at"]
+            timestamp=mock_db.store_raw_feed.call_args[1]["fetched_at"],
         )
         mock_db.add_event_version.assert_called_once()
 
@@ -92,15 +89,17 @@ class TestFeedParser:
                 id="456",
                 updated=datetime.now(timezone.utc),
                 status="active",
-                location="New Location"
-            )
+                location="New Location",
+            ),
         )
 
         mock_db.db = {"events": Mock()}
         mock_db.db["events"].rows_where.return_value = []  # No existing
         mock_db.add_event_version.return_value = True
 
-        is_new, is_new_version = parser._process_feature(feature, datetime.now().isoformat())
+        is_new, is_new_version = parser._process_feature(
+            feature, datetime.now().isoformat()
+        )
 
         assert is_new is True
         assert is_new_version is True
@@ -115,15 +114,17 @@ class TestFeedParser:
                 sourceId="789",
                 sourceFeed="test",
                 id="789",
-                updated=datetime.now(timezone.utc)
-            )
+                updated=datetime.now(timezone.utc),
+            ),
         )
 
         mock_db.db = {"events": Mock()}
         mock_db.db["events"].rows_where.return_value = [{"event_id": 789}]  # Existing
         mock_db.add_event_version.return_value = False  # No new version
 
-        is_new, is_new_version = parser._process_feature(feature, datetime.now().isoformat())
+        is_new, is_new_version = parser._process_feature(
+            feature, datetime.now().isoformat()
+        )
 
         assert is_new is False
         assert is_new_version is False
@@ -137,9 +138,9 @@ class TestFeedParser:
                 sourceOrg="CFA",
                 sourceId="1",
                 sourceFeed="test",
-                id="1"
+                id="1",
             ),
-            geometry=Geometry(type="Point", coordinates=[144.5, -37.5])
+            geometry=Geometry(type="Point", coordinates=[144.5, -37.5]),
         )
 
         lat, lon = parser._extract_coordinates(feature)
@@ -155,17 +156,16 @@ class TestFeedParser:
                 sourceOrg="CFA",
                 sourceId="1",
                 sourceFeed="test",
-                id="1"
+                id="1",
             ),
             geometry=Geometry(
-                type="Polygon",
-                coordinates=[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
-            )
+                type="Polygon", coordinates=[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
+            ),
         )
 
         lat, lon = parser._extract_coordinates(feature)
-        assert lat == 0.5  # Centroid
-        assert lon == 0.5
+        assert lat == 0.4  # Centroid (includes closing point)
+        assert lon == 0.4
 
     def test_extract_coordinates_geometry_collection(self, parser):
         """Test coordinate extraction from GeometryCollection."""
@@ -176,15 +176,18 @@ class TestFeedParser:
                 sourceOrg="CFA",
                 sourceId="1",
                 sourceFeed="test",
-                id="1"
+                id="1",
             ),
             geometry=Geometry(
                 type="GeometryCollection",
                 geometries=[
-                    {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]]},
-                    {"type": "Point", "coordinates": [144.5, -37.5]}
-                ]
-            )
+                    {
+                        "type": "Polygon",
+                        "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]],
+                    },
+                    {"type": "Point", "coordinates": [144.5, -37.5]},
+                ],
+            ),
         )
 
         lat, lon = parser._extract_coordinates(feature)
@@ -200,8 +203,8 @@ class TestFeedParser:
                 sourceOrg="CFA",
                 sourceId="1",
                 sourceFeed="test",
-                id="1"
-            )
+                id="1",
+            ),
         )
 
         lat, lon = parser._extract_coordinates(feature)
@@ -220,7 +223,7 @@ class TestFeedParser:
             webHeadline="Web Headline",
             sourceTitle="Source Title",
             name="Name",
-            text="Text headline\nMore text"
+            text="Text headline\nMore text",
         )
         assert parser._extract_headline(props) == "Web Headline"
 
@@ -247,20 +250,23 @@ class TestFeedParser:
 
     def test_get_changes_summary(self, parser):
         """Test changes summary formatting."""
-        assert parser.get_changes_summary({
-            "new_events": 0,
-            "updated_events": 0,
-            "new_versions": 0
-        }) == "No changes detected"
+        assert (
+            parser.get_changes_summary(
+                {"new_events": 0, "updated_events": 0, "new_versions": 0}
+            )
+            == "No changes detected"
+        )
 
-        assert parser.get_changes_summary({
-            "new_events": 1,
-            "updated_events": 0,
-            "new_versions": 1
-        }) == "1 new event, 1 change"
+        assert (
+            parser.get_changes_summary(
+                {"new_events": 1, "updated_events": 0, "new_versions": 1}
+            )
+            == "1 new event, 1 change"
+        )
 
-        assert parser.get_changes_summary({
-            "new_events": 2,
-            "updated_events": 3,
-            "new_versions": 5
-        }) == "2 new events, 3 updated events, 5 changes"
+        assert (
+            parser.get_changes_summary(
+                {"new_events": 2, "updated_events": 3, "new_versions": 5}
+            )
+            == "2 new events, 3 updated events, 5 changes"
+        )

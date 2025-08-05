@@ -49,9 +49,11 @@ class TestPoller:
         mock_parser.parse_and_store.return_value = {
             "new_events": 2,
             "updated_events": 1,
-            "new_versions": 3
+            "new_versions": 3,
         }
-        mock_parser.get_changes_summary.return_value = "2 new events, 1 updated event, 3 changes"
+        mock_parser.get_changes_summary.return_value = (
+            "2 new events, 1 updated event, 3 changes"
+        )
         mock_parser_class.return_value = mock_parser
 
         # Mock database
@@ -60,7 +62,7 @@ class TestPoller:
             "total_feeds": 10,
             "total_events": 20,
             "total_versions": 30,
-            "events_by_type": {"incident": 15, "warning": 5}
+            "events_by_type": {"incident": 15, "warning": 5},
         }
 
         result = poller.run_once()
@@ -96,8 +98,8 @@ class TestPoller:
     @patch("time.time")
     def test_run_continuous(self, mock_time, mock_sleep, poller):
         """Test continuous polling."""
-        # Mock time progression
-        mock_time.side_effect = [0, 0.5, 1, 11, 11.5, 12]  # Two poll cycles
+        # Mock time progression - add more values to handle multiple time.time() calls
+        mock_time.side_effect = [0, 0.5, 1, 11, 11.5, 12, 22, 22.5, 23]  # Two poll cycles with extra calls
 
         # Mock run_once
         with patch.object(poller, "run_once") as mock_run_once:
@@ -119,7 +121,7 @@ class TestPoller:
             "total_feeds": 10,
             "total_events": 20,
             "total_versions": 30,
-            "events_by_type": {"incident": 15, "warning": 5}
+            "events_by_type": {"incident": 15, "warning": 5},
         }
 
         poller._show_stats()

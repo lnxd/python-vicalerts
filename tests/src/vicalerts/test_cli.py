@@ -33,8 +33,7 @@ class TestCLI:
 
         assert result.exit_code == 0
         mock_poller_class.assert_called_once_with(
-            db_path="vicalerts.sqlite",
-            interval=60
+            db_path="vicalerts.sqlite", interval=60
         )
         mock_poller.run_once.assert_called_once()
         mock_poller.run.assert_not_called()
@@ -49,8 +48,7 @@ class TestCLI:
 
         assert result.exit_code == 0
         mock_poller_class.assert_called_once_with(
-            db_path="vicalerts.sqlite",
-            interval=60
+            db_path="vicalerts.sqlite", interval=60
         )
         mock_poller.run.assert_called_once()
 
@@ -79,15 +77,14 @@ class TestCLI:
         mock_poller = Mock()
         mock_poller_class.return_value = mock_poller
 
-        result = runner.invoke(cli, ["run", "--once", "--interval", "30", "--db", "custom.db"])
-
-        assert result.exit_code == 0
-        mock_poller_class.assert_called_once_with(
-            db_path="custom.db",
-            interval=30
+        result = runner.invoke(
+            cli, ["run", "--once", "--interval", "30", "--db", "custom.db"]
         )
 
-    @patch("src.vicalerts.cli.Poller")
+        assert result.exit_code == 0
+        mock_poller_class.assert_called_once_with(db_path="custom.db", interval=30)
+
+    @patch("src.vicalerts.cli.PollerWithProgress")
     def test_run_keyboard_interrupt(self, mock_poller_class, runner):
         """Test handling keyboard interrupt."""
         mock_poller = Mock()
@@ -99,7 +96,7 @@ class TestCLI:
         assert result.exit_code == 0
         assert "Interrupted by user" in result.output
 
-    @patch("src.vicalerts.cli.Poller")
+    @patch("src.vicalerts.cli.PollerWithProgress")
     def test_run_fatal_error(self, mock_poller_class, runner):
         """Test handling fatal error."""
         mock_poller = Mock()
@@ -111,7 +108,7 @@ class TestCLI:
         assert result.exit_code == 1
         assert "Fatal error: Database error" in result.output
 
-    @patch("src.vicalerts.cli.Database")
+    @patch("src.vicalerts.database.Database")
     def test_stats_command(self, mock_database_class, runner):
         """Test stats command."""
         mock_db = Mock()
@@ -119,7 +116,7 @@ class TestCLI:
             "total_feeds": 100,
             "total_events": 50,
             "total_versions": 200,
-            "events_by_type": {"incident": 30, "warning": 20}
+            "events_by_type": {"incident": 30, "warning": 20},
         }
         mock_database_class.return_value = mock_db
 
@@ -138,12 +135,14 @@ class TestCLI:
 
     def test_stats_no_database(self, runner):
         """Test stats command with missing database."""
-        result = runner.invoke(cli, ["stats"])
+        with runner.isolated_filesystem():
+            # Ensure no database exists
+            result = runner.invoke(cli, ["stats"])
 
-        assert result.exit_code == 1
-        assert "Database not found" in result.output
+            assert result.exit_code == 2  # Click validation error
+            assert "Path 'vicalerts.sqlite' does not exist" in result.output
 
-    @patch("src.vicalerts.cli.Database")
+    @patch("src.vicalerts.database.Database")
     def test_history_command(self, mock_database_class, runner):
         """Test history command."""
         mock_db = Mock()
@@ -157,7 +156,7 @@ class TestCLI:
                 "lat": -37.5,
                 "lon": 144.5,
                 "size_fmt": "Small",
-                "raw_props": {}
+                "raw_props": {},
             },
             {
                 "event_id": 123,
@@ -168,8 +167,8 @@ class TestCLI:
                 "lat": -37.5,
                 "lon": 144.5,
                 "size_fmt": "Small",
-                "raw_props": {}
-            }
+                "raw_props": {},
+            },
         ]
         mock_database_class.return_value = mock_db
 
@@ -186,7 +185,7 @@ class TestCLI:
             assert "contained" in result.output
             assert "-37.500000, 144.500000" in result.output
 
-    @patch("src.vicalerts.cli.Database")
+    @patch("src.vicalerts.database.Database")
     def test_history_no_event(self, mock_database_class, runner):
         """Test history command with non-existent event."""
         mock_db = Mock()

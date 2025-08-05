@@ -70,12 +70,14 @@ class Poller:
 
     def run(self):
         """Run continuous polling loop."""
-        console.print(Panel.fit(
-            "[bold green]VicAlerts[/bold green]\n"
-            f"Polling every {self.interval} seconds\n"
-            "Press Ctrl+C to stop",
-            border_style="green"
-        ))
+        console.print(
+            Panel.fit(
+                "[bold green]VicAlerts[/bold green]\n"
+                f"Polling every {self.interval} seconds\n"
+                "Press Ctrl+C to stop",
+                border_style="green",
+            )
+        )
 
         self.running = True
         last_poll = 0
@@ -126,12 +128,14 @@ class PollerWithProgress(Poller):
 
     def run(self):
         """Run with live countdown display."""
-        console.print(Panel.fit(
-            "[bold green]VicAlerts[/bold green]\n"
-            f"Polling every {self.interval} seconds\n"
-            "Press Ctrl+C to stop",
-            border_style="green"
-        ))
+        console.print(
+            Panel.fit(
+                "[bold green]VicAlerts[/bold green]\n"
+                f"Polling every {self.interval} seconds\n"
+                "Press Ctrl+C to stop",
+                border_style="green",
+            )
+        )
 
         self.running = True
 
@@ -153,7 +157,11 @@ class PollerWithProgress(Poller):
                         if not self.running:
                             break
 
-                        status = "[green]Changes detected[/green]" if changes else "No changes"
+                        status = (
+                            "[green]Changes detected[/green]"
+                            if changes
+                            else "No changes"
+                        )
                         live.update(
                             f"[dim]{timestamp}[/dim] - {status}\n"
                             f"Next poll in {remaining}s..."

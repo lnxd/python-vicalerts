@@ -17,18 +17,16 @@ class FeedParser:
     def __init__(self, database: Database):
         self.db = database
 
-    def parse_and_store(self, feed: GeoJSONFeed, etag: str | None = None) -> dict[str, int]:
+    def parse_and_store(
+        self, feed: GeoJSONFeed, etag: str | None = None
+    ) -> dict[str, int]:
         """
         Parse feed and store changes.
-        
+
         Returns:
             Dict with counts: new_events, updated_events, new_versions
         """
-        stats = {
-            "new_events": 0,
-            "updated_events": 0,
-            "new_versions": 0
-        }
+        stats = {"new_events": 0, "updated_events": 0, "new_versions": 0}
 
         # Store raw feed
         now = datetime.now(timezone.utc).isoformat()
@@ -54,7 +52,7 @@ class FeedParser:
     def _process_feature(self, feature: Feature, timestamp: str) -> tuple[bool, bool]:
         """
         Process a single feature.
-        
+
         Returns:
             Tuple of (is_new_event, is_new_version)
         """
@@ -62,7 +60,11 @@ class FeedParser:
 
         # Convert sourceId to int for database if possible, otherwise hash it
         try:
-            event_id = int(props.sourceId) if isinstance(props.sourceId, str) else props.sourceId
+            event_id = (
+                int(props.sourceId)
+                if isinstance(props.sourceId, str)
+                else props.sourceId
+            )
         except ValueError:
             # For non-numeric IDs, use a hash
             event_id = hash(props.sourceId) & 0x7FFFFFFF  # Keep it positive and 32-bit
@@ -78,7 +80,7 @@ class FeedParser:
             source_org=props.sourceOrg,
             category1=props.category1,
             category2=props.category2,
-            timestamp=timestamp
+            timestamp=timestamp,
         )
 
         # Extract version timestamp
@@ -104,12 +106,16 @@ class FeedParser:
             lon=lon,
             location=props.location,
             size_fmt=props.sizeFmt,
-            raw_props=json.loads(props.model_dump_json())  # Serialize then parse for datetime handling
+            raw_props=json.loads(
+                props.model_dump_json()
+            ),  # Serialize then parse for datetime handling
         )
 
         return is_new, is_new_version
 
-    def _extract_coordinates(self, feature: Feature) -> tuple[float | None, float | None]:
+    def _extract_coordinates(
+        self, feature: Feature
+    ) -> tuple[float | None, float | None]:
         """Extract lat/lon from feature geometry."""
         if not feature.geometry:
             return None, None
@@ -157,7 +163,7 @@ class FeedParser:
 
         if props.text:
             # Extract first line
-            lines = props.text.strip().split('\n')
+            lines = props.text.strip().split("\n")
             if lines:
                 return lines[0][:200]  # Limit length
 
@@ -168,13 +174,19 @@ class FeedParser:
         parts = []
 
         if stats["new_events"]:
-            parts.append(f"{stats['new_events']} new event{'s' if stats['new_events'] != 1 else ''}")
+            parts.append(
+                f"{stats['new_events']} new event{'s' if stats['new_events'] != 1 else ''}"
+            )
 
         if stats["updated_events"]:
-            parts.append(f"{stats['updated_events']} updated event{'s' if stats['updated_events'] != 1 else ''}")
+            parts.append(
+                f"{stats['updated_events']} updated event{'s' if stats['updated_events'] != 1 else ''}"
+            )
 
         if stats["new_versions"]:
-            parts.append(f"{stats['new_versions']} change{'s' if stats['new_versions'] != 1 else ''}")
+            parts.append(
+                f"{stats['new_versions']} change{'s' if stats['new_versions'] != 1 else ''}"
+            )
 
         if not parts:
             return "No changes detected"

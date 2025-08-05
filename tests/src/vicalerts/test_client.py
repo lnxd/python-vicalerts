@@ -115,8 +115,8 @@ class TestRetryClient:
         mock_response.json.return_value = sample_geojson_response
         mock_response.headers = {}
 
-        with patch.object(client.session, 'get', return_value=mock_response):
-            feed, etag, status = client.fetch_with_retry()
+        client.session.get.return_value = mock_response
+        feed, etag, status = client.fetch_with_retry()
 
         assert isinstance(feed, GeoJSONFeed)
         assert client.session.get.call_count == 1
@@ -135,12 +135,8 @@ class TestRetryClient:
         mock_response_success.json.return_value = sample_geojson_response
         mock_response_success.headers = {}
 
-        with patch.object(client.session, 'get', side_effect=[
-            mock_response_fail,
-            mock_response_fail,
-            mock_response_success
-        ]):
-            feed, etag, status = client.fetch_with_retry()
+        client.session.get.side_effect = [mock_response_fail, mock_response_fail, mock_response_success]
+        feed, etag, status = client.fetch_with_retry()
 
         assert isinstance(feed, GeoJSONFeed)
         assert client.session.get.call_count == 3
@@ -153,8 +149,8 @@ class TestRetryClient:
             "Server error", request=Mock(), response=Mock(status_code=500)
         )
 
-        with patch.object(client.session, 'get', return_value=mock_response):
-            with pytest.raises(httpx.HTTPStatusError):
-                client.fetch_with_retry()
+        client.session.get.return_value = mock_response
+        with pytest.raises(httpx.HTTPStatusError):
+            client.fetch_with_retry()
 
         assert client.session.get.call_count == 3

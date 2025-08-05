@@ -34,7 +34,7 @@ class TestModels:
             sourceOrg="CFA",
             sourceId="123",
             sourceFeed="test",
-            id="123"
+            id="123",
         )
         assert props.feedType == "incident"
         assert props.sourceOrg == "CFA"
@@ -47,7 +47,7 @@ class TestModels:
             sourceOrg="CFA",
             sourceId="123",
             sourceFeed="test",
-            id="123"
+            id="123",
         )
         assert props1.sourceId == "123"
 
@@ -57,7 +57,7 @@ class TestModels:
             sourceOrg="CFA",
             sourceId=123,
             sourceFeed="test",
-            id=123
+            id=123,
         )
         assert props2.sourceId == 123
 
@@ -70,15 +70,14 @@ class TestModels:
 
         # Polygon
         polygon = Geometry(
-            type="Polygon",
-            coordinates=[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
+            type="Polygon", coordinates=[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
         )
         assert polygon.type == "Polygon"
 
         # GeometryCollection
         geom_collection = Geometry(
             type="GeometryCollection",
-            geometries=[{"type": "Point", "coordinates": [0, 0]}]
+            geometries=[{"type": "Point", "coordinates": [0, 0]}],
         )
         assert geom_collection.type == "GeometryCollection"
 
@@ -93,9 +92,9 @@ class TestModels:
                 sourceFeed="test",
                 id="123",
                 created=datetime.now(),
-                updated=datetime.now()
+                updated=datetime.now(),
             ),
-            geometry=Geometry(type="Point", coordinates=[144.5, -37.5])
+            geometry=Geometry(type="Point", coordinates=[144.5, -37.5]),
         )
         assert feature.type == "Feature"
         assert feature.properties.sourceId == "123"
@@ -113,10 +112,10 @@ class TestModels:
                         sourceOrg="CFA",
                         sourceId="123",
                         sourceFeed="test",
-                        id="123"
-                    )
+                        id="123",
+                    ),
                 )
-            ]
+            ],
         )
         assert feed.type == "FeatureCollection"
         assert len(feed.features) == 1
@@ -129,6 +128,6 @@ class TestModels:
             sourceId="123",
             sourceFeed="test",
             id="123",
-            customField="custom value"
+            customField="custom value",
         )
         assert hasattr(props, "customField")

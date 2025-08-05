@@ -33,7 +33,7 @@ class TestCLI:
 
         assert result.exit_code == 0
         mock_poller_class.assert_called_once_with(
-            db_path="vicemergency.sqlite",
+            db_path="vicalerts.sqlite",
             interval=60
         )
         mock_poller.run_once.assert_called_once()
@@ -49,7 +49,7 @@ class TestCLI:
 
         assert result.exit_code == 0
         mock_poller_class.assert_called_once_with(
-            db_path="vicemergency.sqlite",
+            db_path="vicalerts.sqlite",
             interval=60
         )
         mock_poller.run.assert_called_once()
@@ -125,7 +125,7 @@ class TestCLI:
 
         # Create a temporary database file
         with runner.isolated_filesystem():
-            Path("vicemergency.sqlite").touch()
+            Path("vicalerts.sqlite").touch()
 
             result = runner.invoke(cli, ["stats"])
 
@@ -174,7 +174,7 @@ class TestCLI:
         mock_database_class.return_value = mock_db
 
         with runner.isolated_filesystem():
-            Path("vicemergency.sqlite").touch()
+            Path("vicalerts.sqlite").touch()
 
             result = runner.invoke(cli, ["history", "123"])
 
@@ -194,7 +194,7 @@ class TestCLI:
         mock_database_class.return_value = mock_db
 
         with runner.isolated_filesystem():
-            Path("vicemergency.sqlite").touch()
+            Path("vicalerts.sqlite").touch()
 
             result = runner.invoke(cli, ["history", "999"])
 

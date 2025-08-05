@@ -26,7 +26,7 @@ class TestPoller:
         """Test poller initialization."""
         assert poller.interval == 10
         assert poller.running is False
-        mock_database.assert_called_once_with("vicemergency.sqlite")
+        mock_database.assert_called_once_with("vicalerts.sqlite")
 
     def test_signal_handler(self, poller):
         """Test signal handler sets running to False."""

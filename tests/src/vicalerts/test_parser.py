@@ -57,16 +57,20 @@ class TestFeedParser:
         # Mock database operations
         mock_db.db = {"events": Mock()}
         mock_db.db["events"].rows_where.return_value = []  # No existing events
+        mock_db.db["events"].columns = []  # No is_active column for backwards compatibility
         mock_db.add_event_version.return_value = True  # New version
+        mock_db.mark_all_inactive.return_value = 0  # No events to deactivate
 
         stats = parser.parse_and_store(sample_feed, etag="test-etag")
 
         assert stats["new_events"] == 1
         assert stats["updated_events"] == 0
         assert stats["new_versions"] == 1
+        assert stats["deactivated_events"] == 0
 
         # Check database calls
         mock_db.store_raw_feed.assert_called_once()
+        mock_db.mark_all_inactive.assert_called_once()
         mock_db.upsert_event.assert_called_once_with(
             event_id=123,
             feed_type="incident",

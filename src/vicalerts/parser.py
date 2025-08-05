@@ -24,9 +24,9 @@ class FeedParser:
         Parse feed and store changes.
 
         Returns:
-            Dict with counts: new_events, updated_events, new_versions
+            Dict with counts: new_events, updated_events, new_versions, deactivated_events
         """
-        stats = {"new_events": 0, "updated_events": 0, "new_versions": 0}
+        stats = {"new_events": 0, "updated_events": 0, "new_versions": 0, "deactivated_events": 0}
 
         # Store raw feed
         now = datetime.now(timezone.utc).isoformat()
@@ -34,8 +34,11 @@ class FeedParser:
         feed_dict = json.loads(feed_dict)  # Then parse back to dict
         self.db.store_raw_feed(feed_dict, etag=etag, fetched_at=now)
 
-        # Process each feature
+        # Mark all events as inactive before processing
         with self.db.transaction():
+            deactivated_count = self.db.mark_all_inactive()
+
+            # Process each feature
             for feature in feed.features:
                 new_event, new_version = self._process_feature(feature, now)
 
@@ -46,6 +49,14 @@ class FeedParser:
 
                 if new_version:
                     stats["new_versions"] += 1
+
+            # Count events that remain inactive (were removed from feed)
+            if deactivated_count > 0:
+                # Check if is_active column exists
+                columns = [col.name for col in self.db.db["events"].columns]
+                if "is_active" in columns:
+                    result = self.db.db.execute("SELECT COUNT(*) FROM events WHERE is_active = 0").fetchone()
+                    stats["deactivated_events"] = result[0] if result else 0
 
         return stats
 
@@ -186,6 +197,11 @@ class FeedParser:
         if stats["new_versions"]:
             parts.append(
                 f"{stats['new_versions']} change{'s' if stats['new_versions'] != 1 else ''}"
+            )
+
+        if stats.get("deactivated_events"):
+            parts.append(
+                f"{stats['deactivated_events']} event{'s' if stats['deactivated_events'] != 1 else ''} removed"
             )
 
         if not parts:

@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS events (
     feed_type TEXT NOT NULL,
     source_org TEXT,
     category1 TEXT,
-    category2 TEXT
+    category2 TEXT,
+    is_active INTEGER DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS event_versions (
@@ -64,6 +65,19 @@ class Database:
     def _init_schema(self):
         """Initialize database schema."""
         self.db.executescript(SCHEMA_SQL)
+        self._migrate_schema()
+
+    def _migrate_schema(self):
+        """Apply schema migrations to existing databases."""
+        try:
+            # Check if is_active column exists
+            columns = [col.name for col in self.db["events"].columns]
+            if "is_active" not in columns:
+                self.db.execute("ALTER TABLE events ADD COLUMN is_active INTEGER DEFAULT 1")
+                console.print("[yellow]Migrated database: added is_active column to events table[/yellow]")
+        except Exception:
+            # If migration fails, continue without is_active support
+            pass
 
     @contextmanager
     def transaction(self):
@@ -127,22 +141,29 @@ class Database:
         existing = table.rows_where("event_id = ?", [event_id])
         existing_list = list(existing)
 
+        # Check if is_active column exists for backwards compatibility
+        has_is_active = "is_active" in [col.name for col in table.columns]
+
         if existing_list:
-            # Update last_seen
-            table.update(event_id, {"last_seen": timestamp})
+            # Update last_seen and mark as active
+            update_data = {"last_seen": timestamp}
+            if has_is_active:
+                update_data["is_active"] = 1
+            table.update(event_id, update_data)
         else:
             # Insert new event
-            table.insert(
-                {
-                    "event_id": event_id,
-                    "first_seen": timestamp,
-                    "last_seen": timestamp,
-                    "feed_type": feed_type,
-                    "source_org": source_org,
-                    "category1": category1,
-                    "category2": category2,
-                }
-            )
+            insert_data = {
+                "event_id": event_id,
+                "first_seen": timestamp,
+                "last_seen": timestamp,
+                "feed_type": feed_type,
+                "source_org": source_org,
+                "category1": category1,
+                "category2": category2,
+            }
+            if has_is_active:
+                insert_data["is_active"] = 1
+            table.insert(insert_data)
 
     def add_event_version(
         self,
@@ -243,3 +264,13 @@ class Database:
         stats["events_by_type"] = feed_types
 
         return stats
+
+    def mark_all_inactive(self) -> int:
+        """Mark all events as inactive. Returns count of events marked."""
+        # Check if is_active column exists
+        columns = [col.name for col in self.db["events"].columns]
+        if "is_active" not in columns:
+            return 0  # No is_active column, nothing to do
+        
+        result = self.db.execute("UPDATE events SET is_active = 0 WHERE is_active = 1")
+        return result.rowcount

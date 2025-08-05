@@ -274,3 +274,100 @@ class Database:
         
         result = self.db.execute("UPDATE events SET is_active = 0 WHERE is_active = 1")
         return result.rowcount
+
+    def get_all_events(
+        self,
+        show_all: bool = False,
+        feed_type: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        Get all events with their latest version info.
+        
+        Args:
+            show_all: If False (default), only show active events. If True, show all.
+            feed_type: Filter by feed type (incident/warning)
+            category: Filter by category1
+            status: Filter by status
+            limit: Limit number of results
+            
+        Returns:
+            List of events with latest version details
+        """
+        # Check if is_active column exists
+        has_is_active = "is_active" in [col.name for col in self.db["events"].columns]
+        
+        # Build query
+        query = """
+            SELECT 
+                e.event_id,
+                e.feed_type,
+                e.source_org,
+                e.category1,
+                e.category2,
+                e.last_seen,
+                ev.status,
+                ev.headline,
+                ev.location,
+                ev.version_ts
+        """
+        
+        if has_is_active:
+            query += ", e.is_active"
+            
+        query += """
+            FROM events e
+            JOIN (
+                SELECT event_id, MAX(version_ts) as latest_ts
+                FROM event_versions
+                GROUP BY event_id
+            ) latest ON e.event_id = latest.event_id
+            JOIN event_versions ev ON e.event_id = ev.event_id 
+                AND ev.version_ts = latest.latest_ts
+            WHERE 1=1
+        """
+        
+        params = []
+        
+        # Apply filters
+        if not show_all and has_is_active:
+            query += " AND e.is_active = 1"
+            
+        if feed_type:
+            query += " AND e.feed_type = ?"
+            params.append(feed_type)
+            
+        if category:
+            query += " AND e.category1 = ?"
+            params.append(category)
+            
+        if status:
+            query += " AND ev.status = ?"
+            params.append(status)
+            
+        query += " ORDER BY e.last_seen DESC"
+        
+        if limit:
+            query += f" LIMIT {limit}"
+            
+        results = []
+        for row in self.db.execute(query, params):
+            event = {
+                "event_id": row[0],
+                "feed_type": row[1],
+                "source_org": row[2],
+                "category1": row[3],
+                "category2": row[4],
+                "last_seen": row[5],
+                "status": row[6],
+                "headline": row[7],
+                "location": row[8],
+                "version_ts": row[9],
+            }
+            if has_is_active:
+                event["is_active"] = row[10]
+            results.append(event)
+            
+        return results

@@ -225,10 +225,29 @@ def events(db: str, show_all: bool, feed_type: str, category: str, status: str, 
             except:
                 last_updated_str = event["last_seen"][:16]
             
+            # Generate better headline if needed
+            headline = event["headline"]
+            location = event["location"] or ""
+            
+            # Check if headline needs improvement
+            if headline and location:
+                # If headline is "Undefined" or duplicates start of location
+                if (headline.lower() == "undefined" or 
+                    location.startswith(headline) or 
+                    (headline in location and len(headline) < len(location) * 0.5)):
+                    # Build a better headline
+                    category = event["category2"] if event.get("category2") and event["category2"] not in ["Other", "None", None] else event["category1"]
+                    if not category:
+                        category = event["feed_type"]
+                    headline = f"{category} - {location}"
+            elif not headline:
+                # No headline at all
+                headline = event["source_org"] or "N/A"
+            
             # Build row data
             row_data = [
                 str(event["event_id"]),
-                event["headline"] or event["source_org"] or "N/A",
+                headline,
                 event["location"] or "N/A",
                 f"[{status_style}]{event['status'] or 'N/A'}[/{status_style}]",
                 event["category1"] or event["feed_type"],

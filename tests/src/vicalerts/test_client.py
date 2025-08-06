@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, Mock, patch
 import httpx
 import pytest
 
-from src.vicalerts.client import FeedClient, RetryClient
-from src.vicalerts.models import GeoJSONFeed
+from vicalerts.client import FeedClient, RetryClient
+from vicalerts.models import GeoJSONFeed
 
 
 class TestFeedClient:

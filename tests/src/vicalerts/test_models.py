@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from src.vicalerts.models import (
+from vicalerts.models import (
     CAPInfo,
     Feature,
     FeatureProperties,

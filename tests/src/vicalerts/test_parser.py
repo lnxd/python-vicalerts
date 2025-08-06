@@ -5,9 +5,9 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.vicalerts.database import Database
-from src.vicalerts.models import Feature, FeatureProperties, GeoJSONFeed, Geometry
-from src.vicalerts.parser import FeedParser
+from vicalerts.database import Database
+from vicalerts.models import Feature, FeatureProperties, GeoJSONFeed, Geometry
+from vicalerts.parser import FeedParser
 
 
 class TestFeedParser:

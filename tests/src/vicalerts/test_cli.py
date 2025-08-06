@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 from click.testing import CliRunner
 
-from src.vicalerts.cli import cli
+from vicalerts.cli import cli
 
 
 class TestCLI:
@@ -21,9 +21,9 @@ class TestCLI:
         """Test version display."""
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
-        assert "0.1.0" in result.output
+        assert "0.2.0" in result.output
 
-    @patch("src.vicalerts.cli.Poller")
+    @patch("vicalerts.cli.Poller")
     def test_run_once(self, mock_poller_class, runner):
         """Test run command with --once flag."""
         mock_poller = Mock()
@@ -38,7 +38,7 @@ class TestCLI:
         mock_poller.run_once.assert_called_once()
         mock_poller.run.assert_not_called()
 
-    @patch("src.vicalerts.cli.PollerWithProgress")
+    @patch("vicalerts.cli.PollerWithProgress")
     def test_run_continuous(self, mock_poller_class, runner):
         """Test continuous run command."""
         mock_poller = Mock()
@@ -52,7 +52,7 @@ class TestCLI:
         )
         mock_poller.run.assert_called_once()
 
-    @patch("src.vicalerts.cli.Poller")
+    @patch("vicalerts.cli.Poller")
     def test_run_no_progress(self, mock_poller_class, runner):
         """Test run with --no-progress flag."""
         mock_poller = Mock()
@@ -71,7 +71,7 @@ class TestCLI:
         assert result.exit_code == 1
         assert "Interval must be at least 10 seconds" in result.output
 
-    @patch("src.vicalerts.cli.Poller")
+    @patch("vicalerts.cli.Poller")
     def test_run_custom_options(self, mock_poller_class, runner):
         """Test run with custom options."""
         mock_poller = Mock()
@@ -84,7 +84,7 @@ class TestCLI:
         assert result.exit_code == 0
         mock_poller_class.assert_called_once_with(db_path="custom.db", interval=30)
 
-    @patch("src.vicalerts.cli.PollerWithProgress")
+    @patch("vicalerts.cli.PollerWithProgress")
     def test_run_keyboard_interrupt(self, mock_poller_class, runner):
         """Test handling keyboard interrupt."""
         mock_poller = Mock()
@@ -96,7 +96,7 @@ class TestCLI:
         assert result.exit_code == 0
         assert "Interrupted by user" in result.output
 
-    @patch("src.vicalerts.cli.PollerWithProgress")
+    @patch("vicalerts.cli.PollerWithProgress")
     def test_run_fatal_error(self, mock_poller_class, runner):
         """Test handling fatal error."""
         mock_poller = Mock()
@@ -108,7 +108,7 @@ class TestCLI:
         assert result.exit_code == 1
         assert "Fatal error: Database error" in result.output
 
-    @patch("src.vicalerts.database.Database")
+    @patch("vicalerts.database.Database")
     def test_stats_command(self, mock_database_class, runner):
         """Test stats command."""
         mock_db = Mock()
@@ -142,7 +142,7 @@ class TestCLI:
             assert result.exit_code == 2  # Click validation error
             assert "Path 'vicalerts.sqlite' does not exist" in result.output
 
-    @patch("src.vicalerts.database.Database")
+    @patch("vicalerts.database.Database")
     def test_history_command(self, mock_database_class, runner):
         """Test history command."""
         mock_db = Mock()
@@ -185,7 +185,7 @@ class TestCLI:
             assert "contained" in result.output
             assert "-37.500000, 144.500000" in result.output
 
-    @patch("src.vicalerts.database.Database")
+    @patch("vicalerts.database.Database")
     def test_history_no_event(self, mock_database_class, runner):
         """Test history command with non-existent event."""
         mock_db = Mock()

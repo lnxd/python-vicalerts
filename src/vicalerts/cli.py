@@ -1,6 +1,7 @@
 """Command-line interface for Victoria Emergency poller."""
 
 import logging
+from datetime import datetime
 from pathlib import Path
 
 import click
@@ -119,7 +120,15 @@ def history(db: str, event_id: int):
     console.print(f"\n[bold]History for Event {event_id}[/bold]\n")
 
     for i, version in enumerate(versions):
-        console.print(f"[cyan]Version {i + 1} - {version['version_ts']}[/cyan]")
+        # Format timestamp - convert to local timezone
+        try:
+            version_time = datetime.fromisoformat(version['version_ts'].replace("Z", "+00:00"))
+            local_time = version_time.astimezone()
+            time_str = local_time.strftime("%Y-%m-%d %H:%M %Z")
+        except:
+            time_str = version['version_ts']
+        
+        console.print(f"[cyan]Version {i + 1} - {time_str}[/cyan]")
         console.print(f"Status: {version['status'] or 'N/A'}")
         console.print(f"Headline: {version['headline'] or 'N/A'}")
         console.print(f"Location: {version['location'] or 'N/A'}")
@@ -154,7 +163,6 @@ def history(db: str, event_id: int):
 )
 def events(db: str, show_all: bool, feed_type: str, category: str, status: str, limit: int, format: str):
     """List all tracked events."""
-    from datetime import datetime
     from .database import Database
     import json
     import csv
@@ -218,10 +226,13 @@ def events(db: str, show_all: bool, feed_type: str, category: str, status: str, 
                 elif status_lower in ["safe", "patrolled", "complete"]:
                     status_style = "green"
             
-            # Format timestamp
+            # Format timestamp - convert to local timezone
             try:
+                # Parse the UTC timestamp
                 last_updated = datetime.fromisoformat(event["last_seen"].replace("Z", "+00:00"))
-                last_updated_str = last_updated.strftime("%Y-%m-%d %H:%M")
+                # Convert to local timezone
+                local_time = last_updated.astimezone()
+                last_updated_str = local_time.strftime("%Y-%m-%d %H:%M")
             except:
                 last_updated_str = event["last_seen"][:16]
             

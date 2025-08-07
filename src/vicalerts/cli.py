@@ -228,13 +228,13 @@ def events(db: str, show_all: bool, feed_type: str, category: str, status: str, 
             
             # Format timestamp - convert to local timezone
             try:
-                # Parse the UTC timestamp
-                last_updated = datetime.fromisoformat(event["last_seen"].replace("Z", "+00:00"))
+                # Use version_ts (actual event update time) instead of last_seen (sync time)
+                last_updated = datetime.fromisoformat(event["version_ts"].replace("Z", "+00:00"))
                 # Convert to local timezone
                 local_time = last_updated.astimezone()
                 last_updated_str = local_time.strftime("%Y-%m-%d %H:%M")
             except:
-                last_updated_str = event["last_seen"][:16]
+                last_updated_str = event["version_ts"][:16] if event.get("version_ts") else event["last_seen"][:16]
             
             # Generate better headline if needed
             headline = event["headline"]

@@ -111,6 +111,13 @@ class Database:
             "SELECT etag FROM feeds_raw WHERE etag IS NOT NULL ORDER BY id DESC LIMIT 1"
         ).fetchone()
         return result[0] if result else None
+    
+    def get_last_sync_time(self) -> str | None:
+        """Get the timestamp of the most recent sync."""
+        result = self.db.execute(
+            "SELECT fetched_at FROM feeds_raw ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        return result[0] if result else None
 
     def get_raw_feed(self, feed_id: int) -> dict[str, Any] | None:
         """Retrieve and decompress a raw feed by ID."""

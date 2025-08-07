@@ -1,7 +1,7 @@
 """Command-line interface for Victoria Emergency poller."""
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import click
@@ -274,9 +274,27 @@ def events(db: str, show_all: bool, feed_type: str, category: str, status: str, 
         
         console.print(table)
         
+        # Show next sync countdown
+        last_sync = database.get_last_sync_time()
+        if last_sync:
+            try:
+                # Parse last sync time (stored in UTC)
+                last_sync_utc = datetime.fromisoformat(last_sync.replace("Z", "+00:00"))
+                now_utc = datetime.now(timezone.utc)
+                time_since_sync = (now_utc - last_sync_utc).total_seconds()
+                
+                # Assume 60 second interval (default)
+                sync_interval = 60
+                time_until_next = sync_interval - (time_since_sync % sync_interval)
+                
+                if time_until_next > 0 and time_until_next <= sync_interval:
+                    console.print(f"\n[dim]Next sync in: {int(time_until_next)}s[/dim]")
+            except:
+                pass  # Don't show countdown if there's an error
+        
         # Add summary
         if not show_all and has_is_active:
-            console.print(f"\n[dim]Showing active events only. Use --all to see all events.[/dim]")
+            console.print(f"[dim]Showing active events only. Use --all to see all events.[/dim]")
 
 
 if __name__ == "__main__":

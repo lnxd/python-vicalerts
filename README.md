@@ -45,19 +45,6 @@ All commands accept `--help`.
 | Retries      | 3 (1 s, then 2 s, then 4 s)                                                                                        |
 | Database     | `./vicalerts.sqlite`                                                                                               |
 
-## Database outline
-
-* **feeds\_raw** - gzip compressed full feed copies
-  Columns: `id`, `fetched_at`, `etag`, `payload`
-
-* **events** - latest state per event
-  Columns: `event_id`, `first_seen`, `last_seen`, `feed_type`, `category1`, `category2`, `is_active`, ...
-
-* **event\_versions** – every change with timestamp
-  Columns: `event_id`, `version_ts`, `status`, `headline`, `lat`, `lon`, `raw_props`, ...
-
-Indices exist on `event_id`, `feed_type`, and `last_seen`.
-
 ## Example workflows
 
 ```bash
@@ -82,4 +69,3 @@ vicalerts history 123456 --db /data/vic.sqlite
 ## Attribution
 
 Data © State of Victoria (EMV) - data licensed under CC BY 4.0 AU
-Code licensed under *MIT*

@@ -11,7 +11,7 @@ console = Console()
 
 FEED_URL = "https://emergency.vic.gov.au/public/events-geojson.json"
 DEFAULT_TIMEOUT = 30.0
-USER_AGENT = "vicalerts/0.2.2"
+USER_AGENT = "vicalerts/0.2.3"
 
 
 class FeedClient:

@@ -37,7 +37,7 @@ class FeatureProperties(BaseModel):
     updated: datetime | None = None  # Some features may not have this
     location: str | None = None
     size: float | str | None = None  # Can be numeric or "Small", etc
-    sizeFmt: str | None = None
+    sizeFmt: str | list[str] | None = None
     url: str | None = None
     webHeadline: str | None = None
     webBody: str | None = None

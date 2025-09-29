@@ -34,5 +34,5 @@ services:
     labels:
       - "autoheal=true"
       - "com.vicalerts.description=Victorian Emergency Alerts Tracker"
-      - "com.vicalerts.version=0.2.3"
+      - "com.vicalerts.version=0.3.0"
       - "com.vicalerts.maintainer=lnxd"

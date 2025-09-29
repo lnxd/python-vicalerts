@@ -1,0 +1,13 @@
+{
+  "name": "vicalerts-devcontainer",
+  "image": "mcr.microsoft.com/devcontainers/base:debian-12",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-vscode.cpptools"
+      ]
+    }
+  },
+  "postCreateCommand": "sudo apt-get update"
+}

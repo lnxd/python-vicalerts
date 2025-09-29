@@ -9,9 +9,9 @@ from typing import Any
 import sqlite_utils
 from rich.console import Console
 
-console = Console()
+from .constants import DEFAULT_DB_PATH
 
-DEFAULT_DB_PATH = "vicalerts.sqlite"
+console = Console()
 
 
 SCHEMA_SQL = """

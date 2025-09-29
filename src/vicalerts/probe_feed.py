@@ -4,12 +4,13 @@ from pprint import pprint
 
 import httpx
 
+from .constants import FEED_URL
 from .models import GeoJSONFeed
 
 
 def probe_feed():
     """Fetch feed and print discovered keys."""
-    response = httpx.get("https://emergency.vic.gov.au/public/events-geojson.json")
+    response = httpx.get(FEED_URL)
     data = response.json()
 
     # Extract all unique property keys

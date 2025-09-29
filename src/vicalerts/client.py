@@ -5,13 +5,13 @@ import time
 import httpx
 from rich.console import Console
 
+from . import __version__
+from .constants import DEFAULT_TIMEOUT, FEED_URL, MAX_RETRIES
 from .models import GeoJSONFeed
 
 console = Console()
 
-FEED_URL = "https://emergency.vic.gov.au/public/events-geojson.json"
-DEFAULT_TIMEOUT = 30.0
-USER_AGENT = "vicalerts/0.2.3"
+USER_AGENT = f"vicalerts/{__version__}"
 
 
 class FeedClient:
@@ -87,7 +87,7 @@ class RetryClient(FeedClient):
     def __init__(
         self,
         timeout: float = DEFAULT_TIMEOUT,
-        max_retries: int = 3,
+        max_retries: int = MAX_RETRIES,
         base_delay: float = 1.0,
         max_delay: float = 60.0,
     ):

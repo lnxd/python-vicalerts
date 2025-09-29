@@ -10,6 +10,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from .client import RetryClient
+from .constants import DEFAULT_DB_PATH, DEFAULT_INTERVAL
 from .database import Database
 from .parser import FeedParser
 
@@ -19,7 +20,7 @@ console = Console()
 class Poller:
     """Main polling loop with signal handling."""
 
-    def __init__(self, db_path: str = "vicalerts.sqlite", interval: int = 60):
+    def __init__(self, db_path: str = DEFAULT_DB_PATH, interval: int = DEFAULT_INTERVAL):
         self.db = Database(db_path)
         self.interval = interval
         self.running = False

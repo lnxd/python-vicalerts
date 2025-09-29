@@ -10,6 +10,7 @@ from rich.logging import RichHandler
 from rich.table import Table
 
 from . import __version__
+from .constants import DEFAULT_DB_PATH, DEFAULT_INTERVAL, MIN_INTERVAL
 from .poller import Poller, PollerWithProgress
 
 console = Console()
@@ -35,10 +36,10 @@ def cli():
 @cli.command()
 @click.option("--once", is_flag=True, help="Run once and exit")
 @click.option(
-    "--interval", type=int, default=60, help="Polling interval in seconds (default: 60)"
+    "--interval", type=int, default=DEFAULT_INTERVAL, help=f"Polling interval in seconds (default: {DEFAULT_INTERVAL})"
 )
 @click.option(
-    "--db", type=click.Path(), default="vicalerts.sqlite", help="Database file path"
+    "--db", type=click.Path(), default=DEFAULT_DB_PATH, help="Database file path"
 )
 @click.option(
     "--progress/--no-progress",
@@ -49,8 +50,8 @@ def run(once: bool, interval: int, db: str, progress: bool):
     """Start polling the Victoria Emergency feed."""
 
     # Validate interval
-    if interval < 10:
-        console.print("[red]Error: Interval must be at least 10 seconds")
+    if interval < MIN_INTERVAL:
+        console.print(f"[red]Error: Interval must be at least {MIN_INTERVAL} seconds")
         raise click.Abort()
 
     # Create poller
@@ -284,8 +285,8 @@ def events(db: str, show_all: bool, feed_type: str, category: str, status: str, 
                 now_utc = datetime.now(timezone.utc)
                 time_since_sync = (now_utc - last_sync_utc).total_seconds()
                 
-                # Assume 60 second interval (default)
-                sync_interval = 60
+                # Assume default interval
+                sync_interval = DEFAULT_INTERVAL
                 time_until_next = sync_interval - (time_since_sync % sync_interval)
                 
                 if time_until_next > 0 and time_until_next <= sync_interval:

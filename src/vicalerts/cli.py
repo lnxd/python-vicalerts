@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table
 
+from . import __version__
 from .poller import Poller, PollerWithProgress
 
 console = Console()
@@ -25,7 +26,7 @@ logger = logging.getLogger("vicalerts")
 
 
 @click.group()
-@click.version_option(version="0.2.2", prog_name="vicalerts")
+@click.version_option(version=__version__, prog_name="vicalerts")
 def cli():
     """VicAlerts feed poller and change tracker."""
     pass
